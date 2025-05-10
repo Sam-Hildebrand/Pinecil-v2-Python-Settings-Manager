@@ -15,16 +15,16 @@ def pretty_print_dict(title: str, data: dict):
         print(f"  {str(k).ljust(key_width)} : {v}")
 
 async def main(args):
-    # Discover and connect
-    devices = await find_pinecils()
-    if not devices:
-        print("No Pinecil devices found.", file=sys.stderr)
-        sys.exit(1)
-    iron = devices[0]
-    await iron.connect()
 
     if args.command == 'save':
-        # 1) Fetch settings and device version
+        # Discover and connect
+        devices = await find_pinecils()
+        if not devices:
+            print("No Pinecil devices found.", file=sys.stderr)
+            sys.exit(1)
+        iron = devices[0]
+        await iron.connect()
+        # Fetch settings and device version
         settings = await iron.get_all_settings()
         info = await iron.get_info()
         version = info.get('build', 'unknown')
@@ -43,6 +43,14 @@ async def main(args):
         print(f"\nSettings (with version) saved to pickle file: {filename}")
 
     elif args.command == 'write':
+        # Discover and connect
+        devices = await find_pinecils()
+        if not devices:
+            print("No Pinecil devices found.", file=sys.stderr)
+            sys.exit(1)
+        iron = devices[0]
+        await iron.connect()
+
         # 1) Load tuple from pickle
         if not os.path.isfile(args.path):
             print(f"File not found: {args.path}", file=sys.stderr)
@@ -82,6 +90,14 @@ async def main(args):
             print("\nApplied changes and saved to flash.")
 
     elif args.command == 'info':
+        # Discover and connect
+        devices = await find_pinecils()
+        if not devices:
+            print("No Pinecil devices found.", file=sys.stderr)
+            sys.exit(1)
+        iron = devices[0]
+        await iron.connect()
+
         # Print live device state
         settings = await iron.get_all_settings()
         info = await iron.get_info()
