@@ -20,6 +20,11 @@ Install the `pinecil` library:
 ```bash
 pip install pinecil
 ```
+
+For graph support, install the `asciichartpy` and `shutil` library:
+```bash
+pip install asciichartpy shutil
+```
 Ensure you have Python 3.7+ and asyncio support.
 
 ## Usage
@@ -60,6 +65,13 @@ python pinecil_settings_manage.py info
 
 - LIVE DATA: Real-time telemetry (e.g. actual tip temperature, PWM).
 
+### graph
+
+Get a live graph of the tip and handle temperatures, as well as power draw, using the wonderful `asciichartpy` library:
+```
+python pinecil_settings_manage.py graph
+```
+
 ### print
 
 Inspect a saved pickle file without connecting to a device:
@@ -85,6 +97,10 @@ python pinecil_settings_manage.py write settings_backup_v1.0.3.pkl
 4. Check live device data
 ```
 python pinecil_settings_manage.py info
+```
+5. Get a live graph of the tip and handle temperatures, as well as power draw.
+```
+python pinecil_settings_manage.py graph
 ```
 ## Troubleshooting
 

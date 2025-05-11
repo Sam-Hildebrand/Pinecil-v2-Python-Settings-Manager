@@ -1,7 +1,9 @@
-from pinecil import find_pinecils  # if running in a cloned repo, use `from src.pinecil`
+from pinecil import find_pinecils
+import asciichartpy
 import pickle
 import asyncio
 import argparse
+import shutil 
 import os
 import sys
 
@@ -119,8 +121,71 @@ async def main(args):
         print(f"Firmware Version Stored: {file_version}")
         pretty_print_dict("STORED SETTINGS", file_settings)
 
+    elif args.command == 'graph':
+        # Discover and connect
+        devices = await find_pinecils()
+        if not devices:
+            print("No Pinecil devices found.", file=sys.stderr)
+            sys.exit(1)
+        iron = devices[0]
+        await iron.connect()
+
+        temps = []
+        handle_temps = []
+        powers = []
+
+        try:
+            while True:
+                live = await iron.get_live_data()
+                temp  = live.get('LiveTemp', None)
+                handle_temp = live.get('HandleTemp', None)
+                power = live.get('Watts', None)
+
+                # Recompute chart height & width from terminal
+                size = shutil.get_terminal_size()
+                chart_height = max(3, size.lines - 5)         # leave 5 lines for header/margins
+                chart_width  = max(10, size.columns - 10)     # leave 10 cols for padding/labels
+
+                if temp is not None and power is not None and handle_temp is not None:
+                    handle_temp = handle_temp / 10
+                    temps.append(temp)
+                    handle_temps.append(handle_temp)
+                    powers.append(power)
+                    if len(temps) > chart_width:
+                        temps.pop(0)
+                        handle_temps.pop(0)
+                        powers.pop(0)
+
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    # ANSI color codes
+                    RED   = '\033[31m'
+                    GREEN = '\033[32m'
+                    BLUE  = '\033[34m'
+                    RESET = '\033[0m'
+                    print(
+                        f"Pinecil live graph — "
+                        f"temp: {RED}{temp:.1f}°C{RESET}, "
+                        f"handle temp: {GREEN}{handle_temp:.1f}°C{RESET}, "
+                        f"power: {BLUE}{power:.1f} mW{RESET}"
+                    )
+                    print()
+                    chart = asciichartpy.plot(
+                        [temps, handle_temps, powers],
+                        {
+                            'height': chart_height,
+                            'width' : chart_width,
+                            'colors': [asciichartpy.red, asciichartpy.green, asciichartpy.blue]
+                        }
+                    )
+                    print(chart)
+                else:
+                    print("Waiting for valid temp & power data…")
+
+                await asyncio.sleep(args.interval)
+        except (KeyboardInterrupt, asyncio.CancelledError):
+            print("\nExiting graph mode.")
+
     else:
-        # Should never happen
         parser.print_help()
 
 if __name__ == '__main__':
@@ -144,6 +209,12 @@ if __name__ == '__main__':
 
     print_p = subparsers.add_parser('print', help="Print contents of a settings pickle")
     print_p.add_argument('file', help="Path to the .pkl file to inspect")
+
+    graph_p = subparsers.add_parser('graph', help="Live-plot temperature and power with asciichartpy")
+    graph_p.add_argument(
+        '--interval', '-i', type=float, default=0.1,
+        help="Seconds between samples (default: 0.1)"
+    )
 
     args = parser.parse_args()
     asyncio.run(main(args))
