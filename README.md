@@ -10,6 +10,7 @@ Supports dumping and restoring device settings, inspecting current state, and pr
 - **save**: Fetch current settings + firmware version, pretty-print them, and save as a `(version, settings)` pickle file.  
 - **write**: Load a settings pickle, warn if firmware versions differ, diff against device, apply only changed settings, and commit to flash.  
 - **info**: Pretty-print live device state (settings, device info, and live telemetry).  
+- **graph**: Get a live graph inside the terminal of the tip and handle temperatures, as well as power draw. 
 - **print**: Inspect a saved pickle file, showing its firmware version and stored settings.
 
 ---
@@ -45,7 +46,7 @@ python pinecil_settings_manager.py save filename # Creates `mysettings_v1.0.3.pk
 
 Load a settings pickle and apply only changed values to the device.
 ```
-python pinecil_settings_manage.py write path/to/mysettings_v1.0.3.pkl
+python pinecil_settings_manager.py write path/to/mysettings_v1.0.3.pkl
 ```
 - Prompts `[y/N]` if the firmware version in the file differs from the device’s.
 
@@ -57,7 +58,7 @@ python pinecil_settings_manage.py write path/to/mysettings_v1.0.3.pkl
 
 Fetch and pretty-print the device’s current state:
 ```
-python pinecil_settings_manage.py info
+python pinecil_settings_manager.py info
 ```
 - SETTINGS: All saved settings.
 
@@ -67,16 +68,16 @@ python pinecil_settings_manage.py info
 
 ### graph
 
-Get a live graph of the tip and handle temperatures, as well as power draw, using the wonderful `asciichartpy` library:
+Get a live graph inside the terminal of the tip and handle temperatures, as well as power draw, using the wonderful `asciichartpy` library:
 ```
-python pinecil_settings_manage.py graph
+python pinecil_settings_manager.py graph
 ```
 
 ### print
 
 Inspect a saved pickle file without connecting to a device:
 ```
-python pinecil_settings_manage.py print path/to/settings_file.pkl
+python pinecil_settings_manager.py print path/to/settings_file.pkl
 ```
 Shows the stored firmware version and all settings in a human-readable table.
 
@@ -84,23 +85,23 @@ Shows the stored firmware version and all settings in a human-readable table.
 
 1. Save settings to disk
 ```
-python pinecil_settings_manage.py save settings_backup
+python pinecil_settings_manager.py save settings_backup
 ```
 2. Inspect the backup
 ```
-python pinecil_settings_manage.py print settings_backup_v1.0.3.pkl
+python pinecil_settings_manager.py print settings_backup_v1.0.3.pkl
 ```
 3. Restore to device
 ```
-python pinecil_settings_manage.py write settings_backup_v1.0.3.pkl
+python pinecil_settings_manager.py write settings_backup_v1.0.3.pkl
 ```
 4. Check live device data
 ```
-python pinecil_settings_manage.py info
+python pinecil_settings_manager.py info
 ```
 5. Get a live graph of the tip and handle temperatures, as well as power draw.
 ```
-python pinecil_settings_manage.py graph
+python pinecil_settings_manager.py graph
 ```
 ## Troubleshooting
 
