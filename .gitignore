@@ -1,4 +1,5 @@
 *.pkl
+*.json
 Images
 .mypy_cache
 __pycache__

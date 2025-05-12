@@ -1,5 +1,5 @@
 from pinecil import find_pinecils
-import pickle
+import json
 import asyncio
 import argparse
 import itertools
@@ -49,6 +49,7 @@ async def main(args):
 
     if args.command == 'save':
         iron = await connect_to_iron()
+        
         # Fetch settings and device version
         read_settings = asyncio.Event()
         saving_spin = asyncio.create_task(_spinner("Reading Pinecil Settings...", read_settings))
@@ -62,31 +63,38 @@ async def main(args):
         print(f"\nSaving settings for firmware version: {version}")
         pretty_print_dict("SETTINGS TO SAVE", settings)
 
-        # Build filename: append version and .pkl
+        # Build filename: append version and .json
         base, _ = os.path.splitext(args.filename)
-        filename = f"{base}_v{version}.pkl"
+        filename = f"{base}_v{version}.json"
 
-        # Dump a tuple (version, settings)
-        with open(filename, 'wb') as f:
-            pickle.dump((version, settings), f)
-        print(f"\nSettings saved to pickle file: {filename}")
+        # Dump a dict with version and settings to JSON
+        data = {
+            'version': version,
+            'settings': settings
+        }
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        print(f"\nSettings saved to JSON file: {filename}")
 
     elif args.command == 'write':
         iron = await connect_to_iron()
 
-        # Load tuple from pickle
+        # Load JSON file
         if not os.path.isfile(args.path):
             print(f"File not found: {args.path}", file=sys.stderr)
             sys.exit(1)
-        with open(args.path, 'rb') as f:
-            file_version, loaded_settings = pickle.load(f)
+        with open(args.path, 'r') as f:
+            data = json.load(f)
+        file_version = data.get('version', 'unknown')
+        loaded_settings = data.get('settings', {})
 
         # Fetch current device version
         info = await iron.get_info()
         device_version = info.get('build', 'unknown')
 
         # Warn if versions differ
-        print(f"\nPickle file version : {file_version}")
+        print(f"\nJSON file version      : {file_version}")
         print(f"Device firmware version: {device_version}")
         if file_version != device_version:
             resp = input("Versions differ. Proceed anyway? [y/N]: ").strip().lower()
@@ -116,6 +124,7 @@ async def main(args):
             await iron.save_to_flash()
             print("\nApplied changes and saved to flash.")
 
+
     elif args.command == 'info':
         iron = await connect_to_iron()        
 
@@ -132,12 +141,14 @@ async def main(args):
         pretty_print_dict("LIVE DATA", live)
 
     elif args.command == 'print':
-        # Load tuple from pickle
+        # Load JSON file
         if not os.path.isfile(args.file):
             print(f"File not found: {args.file}", file=sys.stderr)
             sys.exit(1)
-        with open(args.file, 'rb') as f:
-            file_version, file_settings = pickle.load(f)
+        with open(args.file, 'r') as f:
+            data = json.load(f)
+        file_version = data.get('version', 'unknown')
+        file_settings = data.get('settings', {})
 
         # Display header and contents
         print(f"\n=== SETTINGS FILE: {os.path.basename(args.file)} ===")
@@ -183,7 +194,7 @@ async def main(args):
                     BLUE  = '\033[34m'
                     RESET = '\033[0m'
                     print(
-                        f"Pinecil live graph — "
+                        f"Pinecil live graph - "
                         f"temp: {RED}{temp:.1f}°C{RESET}, "
                         f"handle temp: {GREEN}{handle_temp:.1f}°C{RESET}, "
                         f"power: {BLUE}{power:.1f} mW{RESET}"
