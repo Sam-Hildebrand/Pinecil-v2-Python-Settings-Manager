@@ -7,11 +7,11 @@ Supports dumping and restoring device settings, inspecting current state, and pr
 
 ## Features
 
-- **save**: Fetch current settings + firmware version, pretty-print them, and save as a `(version, settings)` pickle file.  
-- **write**: Load a settings pickle, warn if firmware versions differ, diff against device, apply only changed settings, and commit to flash.  
+- **save**: Fetch current settings and firmware version, pretty-print them, and save as a `(version, settings)` JSON file.  
+- **write**: Load a settings JSON, warn if firmware versions differ, diff against device, apply only changed settings, and commit to flash.  
 - **info**: Pretty-print live device state (settings, device info, and live telemetry).  
 - **graph**: Get a live graph inside the terminal of the tip and handle temperatures, as well as power draw. 
-- **print**: Inspect a saved pickle file, showing its firmware version and stored settings.
+- **print**: Inspect a saved JSON settings file, showing its firmware version and stored settings.
 
 ---
 
@@ -38,15 +38,15 @@ python pinecil_settings_manager.py <command> [arguments]
 
 Dump the current device settings to a pickle, annotated with firmware version.
 ```
-python pinecil_settings_manager.py save filename # Creates `mysettings_v1.0.3.pkl`, pretty-prints settings being saved.
+python pinecil_settings_manager.py save filename # Creates `mysettings_v1.0.3.json`, pretty-prints settings being saved.
 
-# filename: Base name (without extension). The script appends _v<version>.pkl.
+# filename: Base name (without extension). The script appends _v<version>.json.
 ```
 ### write
 
 Load a settings pickle and apply only changed values to the device.
 ```
-python pinecil_settings_manager.py write path/to/mysettings_v1.0.3.pkl
+python pinecil_settings_manager.py write path/to/mysettings_v1.0.3.json
 ```
 - Prompts `[y/N]` if the firmware version in the file differs from the device’s.
 
@@ -77,7 +77,7 @@ python pinecil_settings_manager.py graph
 
 Inspect a saved pickle file without connecting to a device:
 ```
-python pinecil_settings_manager.py print path/to/settings_file.pkl
+python pinecil_settings_manager.py print path/to/settings_file.json
 ```
 Shows the stored firmware version and all settings in a human-readable table.
 
@@ -89,11 +89,11 @@ python pinecil_settings_manager.py save settings_backup
 ```
 2. Inspect the backup
 ```
-python pinecil_settings_manager.py print settings_backup_v1.0.3.pkl
+python pinecil_settings_manager.py print settings_backup_v1.0.3.json
 ```
 3. Restore to device
 ```
-python pinecil_settings_manager.py write settings_backup_v1.0.3.pkl
+python pinecil_settings_manager.py write settings_backup_v1.0.3.json
 ```
 4. Check live device data
 ```
