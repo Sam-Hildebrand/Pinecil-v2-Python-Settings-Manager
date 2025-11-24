@@ -230,15 +230,15 @@ if __name__ == '__main__':
     )
     subparsers = parser.add_subparsers(dest='command', required=True)
 
-    save_p = subparsers.add_parser('save', help="Save the devices current settings as a pickle file")
+    save_p = subparsers.add_parser('save', help="Save the devices current settings as a json file")
     save_p.add_argument('filename', help="Base name for output (version & .pkl appended)")
 
-    write_p = subparsers.add_parser('write', help="Write settings from a pickle file to the device")
+    write_p = subparsers.add_parser('write', help="Write settings from a json file to the device")
     write_p.add_argument('path', help="Path to the .pkl file to load")
 
     subparsers.add_parser('info', help="Print current settings, info, and live data")
 
-    print_p = subparsers.add_parser('print', help="Print contents of a settings pickle")
+    print_p = subparsers.add_parser('print', help="Print contents of a settings json")
     print_p.add_argument('file', help="Path to the .pkl file to inspect")
 
     graph_p = subparsers.add_parser('graph', help="Live-plot temperature and power with asciichartpy")

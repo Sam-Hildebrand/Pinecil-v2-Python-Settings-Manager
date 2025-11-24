@@ -36,7 +36,7 @@ python pinecil_settings_manager.py <command> [arguments]
 ## Commands
 ### save
 
-Dump the current device settings to a pickle, annotated with firmware version.
+Dump the current device settings to a json file, annotated with firmware version.
 ```
 python pinecil_settings_manager.py save filename # Creates `mysettings_v1.0.3.json`, pretty-prints settings being saved.
 
@@ -44,7 +44,7 @@ python pinecil_settings_manager.py save filename # Creates `mysettings_v1.0.3.js
 ```
 ### write
 
-Load a settings pickle and apply only changed values to the device.
+Load a settings json and apply only changed values to the device.
 ```
 python pinecil_settings_manager.py write path/to/mysettings_v1.0.3.json
 ```
@@ -75,7 +75,7 @@ python pinecil_settings_manager.py graph
 
 ### print
 
-Inspect a saved pickle file without connecting to a device:
+Inspect a saved json file without connecting to a device:
 ```
 python pinecil_settings_manager.py print path/to/settings_file.json
 ```
